@@ -36,6 +36,8 @@ Returns **[string]** response web URL string of QR code generated which needs to
 
 ### Step 6: You will get user data on registered webhook, as belows:
 
+We expect 200 as a API response after you receive receive a callback otherwise earthID will retry for 2 more times. also you can check for duplicate post requests by reqNo.
+
 #### User approved authorization
 ```
 {
@@ -64,7 +66,30 @@ Returns **[string]** response web URL string of QR code generated which needs to
 
 #### verifyGatewaySignature 
 
-There are a few HTTP headers that are useful for your application when consuming the webhook request. x-request-type lets your app know, response is for login or document. x-request-signature-sha256 contains a HMAC SHA256 hash based on the webhook payload and a key which is your app secret key. The webhook signature should be validated prior to parsing the webhook payload.
+Before we process any data from the webhook we’ll want to validate that the request really came from EarthID and not someone pretending to be EarthID. EarthID signs each webhook request with the your application secretKey. The signature is contained in the x-request-signature-sha256 header and is a SHA256 HMAC hash of the request body with the key being your application secretKey.
+
+You can validate the webhook by generating the same SHA256 HMAC hash and comparing it to the signature sent with the payload.
+
+```
+export async function verifyGatewaySignature(req) {
+    try {
+        const hmacReceived = req.headers["x-request-signature-sha-256"];
+        const reqBody = req.body;
+        if (hmacReceived && reqBody) {
+            var hmacCreated = crypto.createHmac('sha256', 'QWERTFCXSWERTGV').update(JSON.stringify()).digest('hex');
+            if (hmacReceived === hmacCreated) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } catch (e) {
+        return Error(e);
+    }
+}
+```
 
 #### Parameters
 -   `req` **[object]** req object of postback URL received
