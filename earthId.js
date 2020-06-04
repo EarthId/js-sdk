@@ -47,7 +47,7 @@ export async function verifyGatewaySignature(req) {
         const hmacReceived = req.headers["x-request-signature-sha-256"];
         const reqBody = req.body;
         if (hmacReceived && reqBody) {
-            var hmacCreated = crypto.createHmac('sha256', 'QWERTFCXSWERTGV').update(JSON.stringify()).digest('hex');
+            var hmacCreated = crypto.createHmac('sha256', 'YOUR_SECRET_KEY').update(JSON.stringify()).digest('hex');
             if (hmacReceived === hmacCreated) {
                 return true;
             } else {
@@ -66,7 +66,7 @@ async function getHeaders() {
     const timestamp = Date.now().toString();
     const nonce = await generateRandomNonce();
     var payloadBody = API_KEY + nonce + timestamp;
-    var signature = crypto.createHmac('sha256', SECRET_KEY).update(JSON.stringify(payloadBody)).digest('hex');
+    var signature = crypto.createHmac('sha256', 'YOUR_SECRET_KEY').update(JSON.stringify(payloadBody)).digest('hex');
     return {
         'x-request-signature-sha-256': signature,
         'api-key': API_KEY,
