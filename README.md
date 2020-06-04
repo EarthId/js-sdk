@@ -76,7 +76,7 @@ export async function verifyGatewaySignature(req) {
         const hmacReceived = req.headers["x-request-signature-sha-256"];
         const reqBody = req.body;
         if (hmacReceived && reqBody) {
-            var hmacCreated = crypto.createHmac('sha256', 'QWERTFCXSWERTGV').update(JSON.stringify()).digest('hex');
+            var hmacCreated = crypto.createHmac('sha256', 'SECRET_KEY').update(JSON.stringify()).digest('hex');
             if (hmacReceived === hmacCreated) {
                 return true;
             } else {
